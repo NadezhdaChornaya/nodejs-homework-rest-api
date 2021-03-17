@@ -3,7 +3,6 @@ const router = express.Router()
 const { listContacts, getContactById, addContact, removeContact, updateContact } = require('../../model/index')
 
 router.get('/', async (req, res, next) => {
-  // res.send('<h1>Hello</h1>')
   try {
     const contacts = await listContacts()
     res.json({
@@ -42,14 +41,22 @@ router.get('/:contactId', async (req, res, next) => {
 
 router.post('/', async (req, res, next) => {
   const { name, email, phone } = req.body
+  const err = (field) => {
+    const error = {
+      status: 'error',
+      code: 400,
+      message: `missing required ${field} field`,
+      data: 'Not found'
+    }
+    return error
+  }
   try {
-    if (!name || !email || !phone) {
-      return res.status(400).json({
-        status: 'error',
-        code: 400,
-        message: 'missing required name field',
-        data: 'Not found'
-      })
+    if (!name) {
+      return res.status(400).json(err('name'))
+    } else if (!email) {
+      return res.status(400).json(err('email'))
+    } else if (!phone) {
+      return res.status(400).json(err('phone'))
     } else {
       const newContact = await addContact(req.body)
       return res.json({
