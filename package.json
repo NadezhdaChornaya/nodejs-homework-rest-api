@@ -1,5 +1,5 @@
 {
-  "name": "template",
+  "name": "rest-api",
   "version": "0.0.0",
   "private": true,
   "scripts": {
@@ -25,5 +25,24 @@
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-promise": "^4.2.1",
     "nodemon": "2.0.7"
-  }
+  },
+  "description": "Выполните форк этого репозитория для выполнения домашних заданий (2-6) Форк создаст репозиторий на вашем http://github.com",
+  "main": ".eslintrc.js",
+  "bin": {
+    "rest-api": "server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/NadezhdaChornaya/nodejs-homework-rest-api.git"
+  },
+  "keywords": [
+    "node",
+    "node.js"
+  ],
+  "author": "Nadezhda Chornaya <nadezhdachornaja@gmail.com>",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/NadezhdaChornaya/nodejs-homework-rest-api/issues"
+  },
+  "homepage": "https://github.com/NadezhdaChornaya/nodejs-homework-rest-api#readme"
 }
