@@ -36,7 +36,7 @@ const addContact = async (body) => {
 
 const updateContact = async (body, contactId) => {
   try {
-    const contacts = await Contact.findByIdAndUpdate({ _id: contactId }, { ...body }, { new: true })
+    const contacts = await Contact.findByIdAndUpdate({ _id: contactId }, { body }, { new: true })
     return contacts
   } catch (err) {
     console.log(err.message)
