@@ -1,35 +1,25 @@
-const fs = require('fs/promises')
-const path = require('path')
-const { v4: uuidv4 } = require('uuid')
-
-const contactsPath = path.join(__dirname, './contacts.json')
+const Contact = require('./contactSchema')
 
 const listContacts = async () => {
   try {
-    const contactsList = await fs.readFile(contactsPath)
-    return JSON.parse(contactsList)
+    const contactsList = await Contact.find({})
+    return contactsList
   } catch (err) {
     console.log(err.message)
   }
 }
-
 const getContactById = async (contactId) => {
   try {
-    const contacts = await listContacts()
-    return contacts.find(({ id }) => id.toString() === contactId)
+    const contacts = await Contact.findOne({ _id: contactId })
+    return contacts
   } catch (err) {
     console.log(err.message)
   }
 }
-
 const removeContact = async (contactId) => {
   try {
-    const contacts = await listContacts()
-    const newContactsList = JSON.stringify(contacts.filter(
-      ({ id }) => id.toString() !== contactId
-    ))
-    await fs.writeFile(contactsPath, newContactsList)
-    return contacts.find(({ id }) => id.toString() === contactId)
+    const contacts = await Contact.findByIdAndRemove({ _id: contactId })
+    return contacts
   } catch (err) {
     console.log(err.message)
   }
@@ -37,32 +27,17 @@ const removeContact = async (contactId) => {
 
 const addContact = async (body) => {
   try {
-    const newContact = { id: uuidv4(), ...body }
-    const contacts = await listContacts()
-    const newContactsArr = JSON.stringify([...contacts, newContact])
-    await fs.writeFile(contactsPath, newContactsArr)
-    return newContact
+    const contacts = Contact.create(body)
+    return contacts
   } catch (err) {
     console.log(err.message)
   }
 }
 
-const updateContact = async (contactId, body) => {
+const updateContact = async (body, contactId) => {
   try {
-    const contacts = await listContacts()
-    const contactToUpdate = contacts.find(
-      ({ id }) => id.toString() === contactId
-    )
-    const updatedContact = { ...contactToUpdate, ...body }
-    const updatedContactsList = JSON.stringify(contacts.map((item) =>
-      item.id.toString() === updatedContact.id.toString()
-        ? updatedContact
-        : item
-    ))
-    await fs.writeFile(
-      contactsPath, updatedContactsList)
-
-    return updatedContact
+    const contacts = await Contact.findByIdAndUpdate({ _id: contactId }, { body }, { new: true })
+    return contacts
   } catch (err) {
     console.log(err.message)
   }
