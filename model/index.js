@@ -1,46 +1,47 @@
-const Contact = require('./contactSchema')
+const Contact = require('./shemas/contactSchema')
 
-const listContacts = async () => {
-  try {
-    const contactsList = await Contact.find({})
-    return contactsList
-  } catch (err) {
-    console.log(err.message)
-  }
+const listContacts = async (userId, { limit = 5, page = 1, sortBy, sortByDesc }) => {
+  const { docs: contacts, totalDocs: total } = await Contact.paginate(
+    { owner: userId },
+    {
+      limit,
+      page,
+      sort: {
+        ...(sortBy ? { [`${sortBy}`]: 1 } : {}),
+        ...(sortByDesc ? { [`${sortByDesc}`]: -1 } : {}),
+      },
+      populate: {
+        path: 'owner',
+        select: 'email subscription -_id'
+      }
+    }
+  )
+  return { contacts, total, page: Number(page), limit: Number(limit) }
 }
-const getContactById = async (contactId) => {
-  try {
-    const contacts = await Contact.findOne({ _id: contactId })
-    return contacts
-  } catch (err) {
-    console.log(err.message)
-  }
+const getContactById = async (userId, contactId) => {
+  const contactById = await Contact.findOne({ _id: contactId, owner: userId }).populate({
+    path: 'owner',
+    select: 'email subscription -_id'
+  })
+  return contactById
 }
-const removeContact = async (contactId) => {
-  try {
-    const contacts = await Contact.findByIdAndRemove({ _id: contactId })
-    return contacts
-  } catch (err) {
-    console.log(err.message)
-  }
-}
-
-const addContact = async (body) => {
-  try {
-    const contacts = Contact.create(body)
-    return contacts
-  } catch (err) {
-    console.log(err.message)
-  }
+const removeContact = async (userId, contactId) => {
+  const contactToRemove = Contact.findByIdAndRemove({ _id: contactId, owner: userId })
+  return contactToRemove
 }
 
-const updateContact = async (body, contactId) => {
-  try {
-    const contacts = await Contact.findByIdAndUpdate({ _id: contactId }, { body }, { new: true })
-    return contacts
-  } catch (err) {
-    console.log(err.message)
-  }
+const addContact = async (body, userId) => {
+  const newContact = await Contact.create({ ...body, owner: userId })
+  return newContact
+}
+
+const updateContact = async (userId, body, contactId) => {
+  const updatedContact = await Contact.findByIdAndUpdate(
+    { _id: contactId, owner: userId },
+    body,
+    { new: true }
+  )
+  return updatedContact
 }
 
 module.exports = {

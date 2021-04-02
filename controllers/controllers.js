@@ -2,7 +2,7 @@ const { listContacts, getContactById, addContact, removeContact, updateContact }
 
 const getAllContacts = async (req, res, next) => {
     try {
-        const contacts = await listContacts()
+        const contacts = await listContacts(req.user.id, req.query)
         res.json({
             status: 'success',
             code: 200,
@@ -15,8 +15,9 @@ const getAllContacts = async (req, res, next) => {
 
 const getContactId = async (req, res, next) => {
     const { contactId } = req.params
+    const userId = req.user.id
     try {
-        const contact = await getContactById(contactId)
+        const contact = await getContactById(userId, contactId)
 
         if (contact) {
             return res.json({
@@ -39,6 +40,8 @@ const getContactId = async (req, res, next) => {
 
 const addContactOne = async (req, res, next) => {
     const { name, email, phone } = req.body
+    const userId = req.user.id
+
     const err = (field) => {
         const error = {
             status: 'error',
@@ -56,7 +59,7 @@ const addContactOne = async (req, res, next) => {
         } else if (!phone) {
             return res.status(400).json(err('phone'))
         } else {
-            const newContact = await addContact(req.body)
+            const newContact = await addContact(req.body, userId)
             return res.json({
                 status: 'success',
                 code: 201,
@@ -70,8 +73,9 @@ const addContactOne = async (req, res, next) => {
 
 const deleteContact = async (req, res, next) => {
     const { contactId } = req.params
+    const userId = req.user.id
     try {
-        const contact = await removeContact(contactId)
+        const contact = await removeContact(userId, contactId)
         if (contact) {
             return res.json({
                 status: 'success',
@@ -94,6 +98,7 @@ const deleteContact = async (req, res, next) => {
 
 const updateContactOne = async (req, res, next) => {
     const { contactId } = req.params
+    const userId = req.user.id
     try {
         if (!req.body) {
             return res.status(400).json({
@@ -103,7 +108,7 @@ const updateContactOne = async (req, res, next) => {
                 data: 'Not found'
             })
         } else {
-            const updatedContact = await updateContact(contactId, req.body)
+            const updatedContact = await updateContact(userId, contactId, req.body)
             if (updatedContact) {
                 return res.json({
                     status: 'success',
