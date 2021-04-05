@@ -1,15 +1,17 @@
 const express = require('express')
 const router = express.Router()
-// const usersController = require('../../controllers/usersController')
+const usersController = require('../../controllers/usersControllers')
+const guard = require('../../helpers/guard')
+const { userValidate } = require('../../helpers/validation/validate')
 
-// router.post('/auth/register', usersController.reg)
+router.post('/auth/register', userValidate, usersController.reg)
 
-// router.post('/auth/login', usersController.login)
+router.post('/auth/login', userValidate, usersController.login)
 
-// router.post('/auth/logout', usersController.logout)
+router.post('/auth/logout', guard, usersController.logout)
 
-// router.get('/current', usersController.getUserInfo)
+router.get('/current', guard, usersController.current)
 
-// router.patch('/', usersController.updateUserSubscription)
+router.patch('/', guard, usersController.patch)
 
 module.exports = router
