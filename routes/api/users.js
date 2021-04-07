@@ -1,17 +1,12 @@
 const express = require('express')
 const router = express.Router()
-const usersController = require('../../controllers/usersControllers')
-const guard = require('../../helpers/guard')
-const { userValidate } = require('../../helpers/validation/validate')
+const ctrlUser = require('../../controller/users')
+const { validateUser } = require('../../helpers/validation/validation')
+const { guard } = require('../../helpers/guard')
 
-router.post('/auth/register', userValidate, usersController.reg)
-
-router.post('/auth/login', userValidate, usersController.login)
-
-router.post('/auth/logout', guard, usersController.logout)
-
-router.get('/current', guard, usersController.current)
-
-router.patch('/', guard, usersController.patch)
+router.post('/auth/register', validateUser, ctrlUser.reg)
+router.post('/auth/login', validateUser, ctrlUser.login)
+router.post('/auth/logout', guard, ctrlUser.logout)
+router.get('/current', guard, ctrlUser.current)
 
 module.exports = router

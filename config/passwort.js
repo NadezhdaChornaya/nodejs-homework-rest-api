@@ -1,35 +1,28 @@
-// creating an authentication strategy
 const passport = require('passport')
-const { Strategy, ExtractJwt } = require('passport-jwt')
+const { ExtractJwt, Strategy } = require('passport-jwt')
 const dotenv = require('dotenv')
 dotenv.config()
-const Users = require('../model/users')
-
+const { findUserById } = require('../model/users')
 const { SECRET_KEY } = process.env
 
-// retrieving a token
-
-const jwtParams = {
+const params = {
     secretOrKey: SECRET_KEY,
-    jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken()
+    jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
 }
 
 passport.use(
-    new Strategy(jwtParams, async (payload, done) => {
+    new Strategy(params, async (payload, done) => {
         try {
-            const user = await Users.findById(payload.id)
-
+            const user = await findUserById({ _id: payload.id })
             if (!user) {
                 return done(new Error('User not found'))
             }
-
             if (!user.token) {
                 return done(null, false)
             }
-
             return done(null, user)
-        } catch (error) {
-            done(error)
+        } catch (err) {
+            done(err)
         }
     })
 )

@@ -1,34 +1,28 @@
+const User = require('./shema/user')
 
-const User = require('./shemas/usersShema')
-
-const findUserByEmail = async email => {
-    const user = await User.findOne({ email })
-    return user
+const findUserById = async (id) => {
+    const userById = await User.findById(id)
+    return userById
 }
 
-const findUserById = async id => {
-    const user = await User.findById(id)
-    return user
+const findUserByEmail = async (email) => {
+    const userByEmail = await User.findOne(email)
+    return userByEmail
 }
 
-const createNewUser = async ({ email, password, subscription, token }) => {
-    const user = await new User({ email, password, subscription, token }).save()
-    return user
+const addUser = async (body) => {
+    const newUser = await new User(body).save()
+    return newUser
 }
 
 const updateToken = async (id, token) => {
-    return await User.updateOne({ _id: id }, { token })
-}
-
-const patchSub = async (id, sub) => {
-    const user = await User.findByIdAndUpdate(id, { subscription: sub }, { new: true })
-    return user
+    const newToken = await User.updateOne({ _id: id }, { token })
+    return newToken
 }
 
 module.exports = {
-    findUserByEmail,
     findUserById,
-    createNewUser,
-    updateToken,
-    patchSub,
+    findUserByEmail,
+    addUser,
+    updateToken
 }

@@ -1,46 +1,27 @@
-const Contact = require('./shemas/contactSchema')
+const Contact = require('./shema/contact')
 
-const listContacts = async (userId, { limit = 5, page = 1, sortBy, sortByDesc }) => {
-  const { docs: contacts, totalDocs: total } = await Contact.paginate(
-    { owner: userId },
-    {
-      limit,
-      page,
-      sort: {
-        ...(sortBy ? { [`${sortBy}`]: 1 } : {}),
-        ...(sortByDesc ? { [`${sortByDesc}`]: -1 } : {}),
-      },
-      populate: {
-        path: 'owner',
-        select: 'email subscription -_id'
-      }
-    }
-  )
-  return { contacts, total, page: Number(page), limit: Number(limit) }
+const listContacts = async () => {
+  const contactsList = await Contact.find({})
+  return contactsList
 }
-const getContactById = async (userId, contactId) => {
-  const contactById = await Contact.findOne({ _id: contactId, owner: userId }).populate({
-    path: 'owner',
-    select: 'email subscription -_id'
-  })
+
+const getContactById = async (contactId) => {
+  const contactById = await Contact.findById(contactId)
   return contactById
 }
-const removeContact = async (userId, contactId) => {
-  const contactToRemove = Contact.findByIdAndRemove({ _id: contactId, owner: userId })
-  return contactToRemove
+
+const removeContact = async (contactId) => {
+  const removedContact = await Contact.findByIdAndRemove(contactId)
+  return removedContact
 }
 
-const addContact = async (body, userId) => {
-  const newContact = await Contact.create({ ...body, owner: userId })
+const addContact = async (body) => {
+  const newContact = await Contact.create(body)
   return newContact
 }
 
-const updateContact = async (userId, body, contactId) => {
-  const updatedContact = await Contact.findByIdAndUpdate(
-    { _id: contactId, owner: userId },
-    body,
-    { new: true }
-  )
+const updateContact = async (contactId, body) => {
+  const updatedContact = await Contact.findByIdAndUpdate(contactId, body, { new: true })
   return updatedContact
 }
 
@@ -49,5 +30,5 @@ module.exports = {
   getContactById,
   removeContact,
   addContact,
-  updateContact,
+  updateContact
 }
