@@ -1,46 +1,28 @@
-const Contact = require('./contactSchema')
+const Contact = require('./shema/contact')
 
 const listContacts = async () => {
-  try {
-    const contactsList = await Contact.find({})
-    return contactsList
-  } catch (err) {
-    console.log(err.message)
-  }
+  const contactsList = await Contact.find({})
+  return contactsList
 }
+
 const getContactById = async (contactId) => {
-  try {
-    const contacts = await Contact.findOne({ _id: contactId })
-    return contacts
-  } catch (err) {
-    console.log(err.message)
-  }
+  const contactById = await Contact.findById(contactId)
+  return contactById
 }
+
 const removeContact = async (contactId) => {
-  try {
-    const contacts = await Contact.findByIdAndRemove({ _id: contactId })
-    return contacts
-  } catch (err) {
-    console.log(err.message)
-  }
+  const removedContact = await Contact.findByIdAndRemove(contactId)
+  return removedContact
 }
 
 const addContact = async (body) => {
-  try {
-    const contacts = Contact.create(body)
-    return contacts
-  } catch (err) {
-    console.log(err.message)
-  }
+  const newContact = await Contact.create(body)
+  return newContact
 }
 
-const updateContact = async (body, contactId) => {
-  try {
-    const contacts = await Contact.findByIdAndUpdate({ _id: contactId }, { body }, { new: true })
-    return contacts
-  } catch (err) {
-    console.log(err.message)
-  }
+const updateContact = async (contactId, body) => {
+  const updatedContact = await Contact.findByIdAndUpdate(contactId, body, { new: true })
+  return updatedContact
 }
 
 module.exports = {
@@ -48,5 +30,5 @@ module.exports = {
   getContactById,
   removeContact,
   addContact,
-  updateContact,
+  updateContact
 }
