@@ -2,18 +2,18 @@ const fs = require('fs').promises
 const path = require('path')
 const gravatar = require('gravatar')
 const Jimp = require('jimp')
-const { Subscription } = require('../helpers/constants')
-const folderExists = require('../helpers/folderExists')
-// =====================================
 const jwt = require('jsonwebtoken')
 const dotenv = require('dotenv')
 dotenv.config()
+
+const { Subscription } = require('../helpers/constants')
+const folderExists = require('../helpers/folderExists')
 const { findUserById, findUserByEmail, addUser, updateToken, patchSub, patchAvatar } = require('../model/users')
-// =====================================
+
 const { SECRET_KEY, UPLOAD_DIR } = process.env
 
 const uploadDirectory = path.join(process.cwd(), UPLOAD_DIR)
-// =====================================
+
 
 const reg = async (req, res, next) => {
     try {
@@ -27,11 +27,10 @@ const reg = async (req, res, next) => {
                 message: 'Email in use',
             })
         }
-        // ====================================
 
         const avatarURL = gravatar.url(email, { protocol: 'https', s: '250' })
-        // ====================================
-        const newUser = await addUser({ ...req.body, avatarURL })//{...req.body, avatarURL}
+
+        const newUser = await addUser({ ...req.body, avatarURL })
         return res.status(201).json({
             status: 'success',
             data: {
