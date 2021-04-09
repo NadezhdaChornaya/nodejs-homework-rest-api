@@ -131,4 +131,10 @@ const update = async (req, res, next) => {
     }
 }
 
-module.exports = { get, getById, add, remove, update }
+module.exports = {
+    get,
+    getById,
+    add,
+    remove,
+    update
+}
