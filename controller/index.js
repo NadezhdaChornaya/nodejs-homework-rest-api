@@ -8,7 +8,7 @@ const {
 
 const get = async (req, res, next) => {
     try {
-        const contacts = await listContacts()
+        const contacts = await listContacts(req.user.id, req.query)
         res.json({
             status: 'success',
             code: 200,
@@ -131,4 +131,10 @@ const update = async (req, res, next) => {
     }
 }
 
-module.exports = { get, getById, add, remove, update }
+module.exports = {
+    get,
+    getById,
+    add,
+    remove,
+    update
+}

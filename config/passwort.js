@@ -10,6 +10,7 @@ const params = {
     jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
 }
 
+// JWT Strategy
 passport.use(
     new Strategy(params, async (payload, done) => {
         try {
