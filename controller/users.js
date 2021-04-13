@@ -9,11 +9,38 @@ dotenv.config()
 const { Subscription } = require('../helpers/constants')
 const folderExists = require('../helpers/folderExists')
 const { findUserById, findUserByEmail, addUser, updateToken, patchSub, patchAvatar } = require('../model/users')
-
+// ======================
+const { v4: uuidv4 } = require('uuid')
+// ======================
 const { SECRET_KEY, UPLOAD_DIR } = process.env
 
 const uploadDirectory = path.join(process.cwd(), UPLOAD_DIR)
+// ============================================================
 
+// const verify = async (req, res, next) => {
+//     try {
+//         const result = await userSrvs.verifyServ(req.params)
+//         console.log('verify ===> result', result)
+//         if (result) {
+//             return res.status(HttpCode.OK).json({
+//                 status: 'success',
+//                 code: HttpCode.OK,
+//                 data: {
+//                     message: 'Verification successful',
+//                 },
+//             });
+//         } else {
+//             return next({
+//                 status: HttpCode.BAD_REQUEST,
+//                 message:
+//                     'Your verification token is not valid. Contact with administration',
+//             })
+//         }
+//     } catch (e) {
+//         next(e)
+//     }
+// };
+// ============================================================
 
 const reg = async (req, res, next) => {
     try {
@@ -27,7 +54,12 @@ const reg = async (req, res, next) => {
                 message: 'Email in use',
             })
         }
+        // ==============================================================
+        const verifyToken = uuidv4()
+        const newUser = await addUser({ ...req.body, verifyToken })
 
+        await sendMail(verifyToken, email)
+        // ==============================================================
         const avatarURL = gravatar.url(email, { protocol: 'https', s: '250' })
 
         const newUser = await addUser({ ...req.body, avatarURL })
