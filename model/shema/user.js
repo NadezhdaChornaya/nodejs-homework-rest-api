@@ -29,9 +29,22 @@ const userSchema = new Schema(
             default: null
         },
         avatarURL: String,
+        verify: {
+            type: Boolean,
+            default: false,
+        },
+        verifyToken: {
+            type: String,
+            required: [true, 'Verify token is required'],
+        },
     },
     { versionKey: false, timestamps: true }
 )
+// ============================================================
+// userSchema.path("email").validate(function (value) {
+//     const reg = /^\S+@\S+\.\S+/
+//     return reg.test(String(value).toLowerCase())
+// })
 
 userSchema.pre('save', async function (next) {
     if (!this.isModified('password')) return next()
