@@ -40,11 +40,6 @@ const userSchema = new Schema(
     },
     { versionKey: false, timestamps: true }
 )
-// ============================================================
-// userSchema.path("email").validate(function (value) {
-//     const reg = /^\S+@\S+\.\S+/
-//     return reg.test(String(value).toLowerCase())
-// })
 
 userSchema.pre('save', async function (next) {
     if (!this.isModified('password')) return next()

@@ -12,4 +12,10 @@ router.get('/current', guard, ctrlUser.current)
 router.patch('/patch', guard, ctrlUser.patch)
 router.patch('/avatars', [guard, upload.single('avatar')], ctrlUser.avatar)
 
+// ====================================================================
+router.get('/verify/:verificationToken', ctrlUser.verify)
+
+router.post('/verify', ctrlUser.re)
+// ====================================================================
+
 module.exports = router
