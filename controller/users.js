@@ -9,7 +9,7 @@ const { v4: uuidv4 } = require('uuid')
 
 const { Subscription } = require('../helpers/constants')
 const folderExists = require('../helpers/folderExists')
-const sendEmail = require('../model/email')
+const sendMail = require('../model/email')
 const { findUserById, findUserByEmail, addUser, updateToken, patchSub, patchAvatar, findByVerifyToken, updateVerifyToken } = require('../model/users')
 
 const { SECRET_KEY, UPLOAD_DIR } = process.env
@@ -34,7 +34,7 @@ const reg = async (req, res, next) => {
         const avatarURL = gravatar.url(email, { protocol: 'https', s: '250' })
 
         const newUser = await addUser({ ...req.body, avatarURL, verifyToken })
-        await sendEmail(verifyToken, email)
+        await sendMail(verifyToken, email)
         return res.status(201).json({
             status: 'success',
             data: {
@@ -190,7 +190,7 @@ const verify = async (req, res, next) => {
     }
 }
 
-const re = async (req, res, next) => {
+const repeatEmail = async (req, res, next) => {
     try {
         const { email } = req.body
 
@@ -214,7 +214,7 @@ const re = async (req, res, next) => {
 
         const verifyToken = user.verifyToken
 
-        await sendEmail(verifyToken, email)
+        await sendMail(verifyToken, email)
 
         res.status(200).json({
             status: 'success',
@@ -235,5 +235,5 @@ module.exports = {
     patch,
     avatar,
     verify,
-    re
+    repeatEmail
 }

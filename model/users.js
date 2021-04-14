@@ -1,11 +1,5 @@
 const User = require('./shema/user')
 // =========================================================
-// const EmailService = require("./emailSrvs")
-// const { ErrorHandler } = require("../helpers/errorHandler")
-// const dotenv = require('dotenv')
-// dotenv.config()
-// const { SENDGRID_API_KEY } = process.env
-// const emailService = new EmailService(process.env.SENDGRID_API_KEY)
 
 const verifyServ = async ({ token }) => {
     const user = await User.findOne({
@@ -37,7 +31,7 @@ const updateToken = async (id, token) => {
     const newToken = await User.updateOne({ _id: id }, { token })
     return newToken
 }
-// ===========================================
+
 const patchSub = async (id, sub) => {
     const user = await User.findByIdAndUpdate(id, { subscription: sub }, { new: true })
     return user
@@ -53,7 +47,8 @@ const findByVerifyToken = async (verifyToken) => {
 }
 
 const updateVerifyToken = async (id, verify, verifyToken) => {
-    return await User.findByIdAndUpdate(id, { verify, verifyToken })
+    const user = await User.findByIdAndUpdate(id, { verify, verifyToken })
+    return user
 }
 // ============================================
 
