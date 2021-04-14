@@ -41,9 +41,7 @@ const sendMail = async (verifyToken, email) => {
         html: verificationMail,
     }
 
-    sgMail.send(msg)
-        .then(() => console.log('Email sent'))
-        .catch(error => console.log(error))
+    await sgMail.send(msg)
 }
 
 module.exports = sendMail
