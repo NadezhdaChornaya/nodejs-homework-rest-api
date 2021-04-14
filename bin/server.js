@@ -25,4 +25,3 @@ connection
     console.log(`Server not running. Error message: ${error.message}`)
     process.exit(1)
   })
-

@@ -5,15 +5,16 @@ const Jimp = require('jimp')
 const jwt = require('jsonwebtoken')
 const dotenv = require('dotenv')
 dotenv.config()
+const { v4: uuidv4 } = require('uuid')
 
 const { Subscription } = require('../helpers/constants')
 const folderExists = require('../helpers/folderExists')
-const { findUserById, findUserByEmail, addUser, updateToken, patchSub, patchAvatar } = require('../model/users')
+const sendMail = require('../model/email')
+const { findUserById, findUserByEmail, addUser, updateToken, patchSub, patchAvatar, findByVerifyToken, updateVerifyToken } = require('../model/users')
 
 const { SECRET_KEY, UPLOAD_DIR } = process.env
 
 const uploadDirectory = path.join(process.cwd(), UPLOAD_DIR)
-
 
 const reg = async (req, res, next) => {
     try {
@@ -28,9 +29,12 @@ const reg = async (req, res, next) => {
             })
         }
 
+        const verifyToken = uuidv4()
+
         const avatarURL = gravatar.url(email, { protocol: 'https', s: '250' })
 
-        const newUser = await addUser({ ...req.body, avatarURL })
+        const newUser = await addUser({ ...req.body, avatarURL, verifyToken })
+        await sendMail(verifyToken, email)
         return res.status(201).json({
             status: 'success',
             data: {
@@ -110,7 +114,7 @@ const current = async (req, res, next) => {
         next(err)
     }
 }
-// ====================================
+
 const patch = async (req, res, next) => {
     try {
         const { subscription } = req.body
@@ -155,13 +159,73 @@ const avatar = async (req, res, next) => {
             code: 200,
             message: 'avatar link updated',
             data: { avatarURL: user.avatarURL },
-        });
+        })
     } catch (error) {
         await fs.unlink(tempName)
         return next(error)
     }
 }
+// ===============================================================
 
+const verify = async (req, res, next) => {
+    try {
+        const user = await findByVerifyToken(req.params.verificationToken)
+
+        if (user) {
+            await updateVerifyToken(user.id, true, null)
+            return res.status(200).json({
+                status: 'success',
+                code: 200,
+                message: 'Verification successful!',
+            })
+        }
+
+        return res.status(404).json({
+            status: 'error',
+            code: 404,
+            message: 'User not found',
+        })
+    } catch (err) {
+        next(err)
+    }
+}
+
+const repeatEmail = async (req, res, next) => {
+    try {
+        const { email } = req.body
+
+        if (!email) {
+            return res.status(400).json({
+                status: 'error',
+                code: 400,
+                message: 'missing required field email',
+            })
+        }
+
+        const user = await findUserByEmail(email)
+
+        if (user.verify) {
+            return res.status(400).json({
+                status: 'error',
+                code: 400,
+                message: 'Verification has already been passed',
+            })
+        }
+
+        const verifyToken = user.verifyToken
+
+        await sendMail(verifyToken, email)
+
+        res.status(200).json({
+            status: 'success',
+            code: 200,
+            message: 'Verification email sent',
+        })
+    } catch (err) {
+        next(err)
+    }
+}
+// ===============================================================
 
 module.exports = {
     reg,
@@ -169,5 +233,7 @@ module.exports = {
     logout,
     current,
     patch,
-    avatar
+    avatar,
+    verify,
+    repeatEmail
 }
